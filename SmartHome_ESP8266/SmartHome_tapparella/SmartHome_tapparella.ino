@@ -16,24 +16,24 @@
 #include <EEPROM.h>
 
 // MQTT server
-const char* ssid = "WIFI_SSID";                   // WIFI SSID
-const char* password = "WIFI_password";           // WIFI password
-const char* mqtt_server = "MQTT_server";          // MQTT server
-const char* mqtt_user = "MQTT_user";              // MQTT user
-const char* mqtt_password = "MQTT_password";      // MQTT password
-const int   mqtt_port = MQTT_port;                // MQTT port
+const char* ssid          = "wifi_ssid";      // WIFI SSID
+const char* password      = "wifi_password";  // WIFI password
+const char* mqtt_server   = "mqtt_server";    // MQTT server
+const char* mqtt_user     = "mqtt_user";      // MQTT user
+const char* mqtt_password = "mqtt_password";  // MQTT password
+const int   mqtt_port     = mqtt_port;        // MQTT port
 
 // DEBUG
-#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
+//#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
 
 // HARDWARE
 //#define ESP01                                     // Commentare l'hardware non corrente
-#define NODEMCU                                   // Commentare l'hardware non corrente
-//#define ELECTRODRAGON                             // Commentare l'hardware non corrente
-
+//#define NODEMCU                                   // Commentare l'hardware non corrente
+#define ELECTRODRAGON                             // Commentare l'hardware non corrente
+#define TIPO_NODO         "TAP"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
 
 // MQTT topic
-#define Tapparella_Topic  "tapparella_1"  // Tapparella_Topic
+#define Tapparella_Topic  "tapparella_prototipo"  // Tapparella_Topic
 #define ACK_Topic         "ack"                   // ACK_Topic
 
 // TEMPI
@@ -45,7 +45,7 @@ const int   mqtt_port = MQTT_port;                // MQTT port
 #define TEMPO_RELE                  200           // Indica il tempo tra una commutazione RELE e la successiva
 
 // GPIO
-#if defined(ESP01)
+#if defined(ESP01)                  // OK
 #define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
 #define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
 #define Status_LED                  4             // BUILTIN_LED : nodemcu->GPIO16 - ESP01->GPIO1(TX) 
@@ -63,8 +63,8 @@ const int   mqtt_port = MQTT_port;                // MQTT port
 #define BOTTONE_tapparella_SU       0             // Pulsante tapparella SU
 #define BOTTONE_tapparella_GIU      2             // Pulsante tapparella GIU
 #endif
-#if defined(ELECTRODRAGON)
-#define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)
+#if defined(ELECTRODRAGON)          // OK
+#define Flag_inversione_RELE        0             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)
 #define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
 #define Status_LED                  16            // BUILTIN_LED : nodemcu->GPIO16 - ESP01->GPIO1(TX)
 #define RELE_tapparella_ON          12            // RELE abilitazione
@@ -76,8 +76,8 @@ const int   mqtt_port = MQTT_port;                // MQTT port
 // VARIABILI
 uint8_t       mac[6];                             // MAC ADDRESS
 long          TEMPO_MAX = 10000;                  // Indica per quanto tempo la tapparella può restare in azione (in millisecondi)
-boolean       In_movimento = false;
-int           t = 0;
+boolean       In_movimento = false;               // Indica se la tapparella e' in movimento
+int           t = 0;                              // Usata per intercettare il rilascio del pulsante
 unsigned long ulTime;
 
 WiFiClient espClient;
@@ -96,10 +96,14 @@ void setup() {
   Serial.println("BOTTONE tapparella SU  = GPIO" + String(BOTTONE_tapparella_SU));
   Serial.println("BOTTONE tapparella GIU = GPIO" + String(BOTTONE_tapparella_GIU));
 
+  // Inizializza EEPROM
+  EEPROM.begin(512);
+  delay(10);
+  
   // Inizializza Status_LED
   pinMode(Status_LED, OUTPUT);
   digitalWrite(Status_LED, 0 ^ Flag_inversione_Status_LED);
-  
+
   // Inizializza GPIO
   pinMode(RELE_tapparella_ON, OUTPUT);
   digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);
@@ -113,11 +117,7 @@ void setup() {
   client.setCallback(callback);
   setup_wifi();
   reconnect();
-  
-  // Inizializza EEPROM
-  EEPROM.begin(512);
-  delay(10);
-  
+
   // Leggi TEMPO_MAX dalla EEPROM
   EEPROM_read_tempo();
 }
@@ -126,22 +126,28 @@ void setup_wifi() {
   int i = 0;
   delay(10);
   Serial.print("Connecting to ");
-  Serial.println(ssid);
+  Serial.print(ssid);
+  Serial.print(" ");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while ((WiFi.status() != WL_CONNECTED) and i < MAX_RET_WIFI) {
     ++i;
-    Serial.print(WiFi.status());
+    Serial.print(".");
     digitalWrite(Status_LED, 0 ^ Flag_inversione_Status_LED);
     delay(250);
     digitalWrite(Status_LED, 1 ^ Flag_inversione_Status_LED);
     delay(250);
   }
-  Serial.println();
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("  NOT connected!");
+  }
+  else {
+    Serial.println("  connected!");
+  }
   Serial.print("Local  IP   : ");
   Serial.println(WiFi.localIP());
-  Serial.print("SoftAP IP   : ");
-  Serial.println(WiFi.softAPIP());
+  //  Serial.print("SoftAP IP   : ");
+  //  Serial.println(WiFi.softAPIP());
   Serial.print("MAC address : ");
   WiFi.macAddress(mac);
   Serial.println(macToStr(mac));
@@ -158,16 +164,13 @@ void reconnect() {
     Serial.println(clientName);
     Serial.print("Attempting MQTT connection... ");
     if (client.connect(string2char(clientName), mqtt_user, mqtt_password)) {
-      Serial.println("connected");
+      Serial.println("connected!");
       String payload = macToStr(mac);
       payload += " start at ";
       payload += getTime();
       client.publish(ACK_Topic, (char*) payload.c_str());     // Pubblica su ACK_Topic -> MAC + " start at " + time
       delay(50);
-      payload = macToStr(mac);
-      payload += " alive! ";
-      payload += Tapparella_Topic;
-      client.publish(ACK_Topic, (char*) payload.c_str());     // Pubblica su ACK_Topic -> MAC + " alive! " + Tapparella_Topic
+      Send_ACK();
       client.subscribe(ACK_Topic);                            // Sottoscrivi ACK_Topic
       client.subscribe(Tapparella_Topic);                     // Sottoscrivi Tapparella_Topic
     }
@@ -176,6 +179,15 @@ void reconnect() {
       Serial.println(client.state());
     }
   }
+}
+
+void Send_ACK() {
+  String payload = macToStr(mac);
+  payload += " alive! ";
+  payload += TIPO_NODO;
+  payload += " ";
+  payload += Tapparella_Topic;
+  client.publish(ACK_Topic, (char*) payload.c_str());     // Pubblica su ACK_Topic -> MAC + " alive! " TIPO_NODO + " " + Tapparella_Topic
 }
 
 void callback(char* topic, byte* message, unsigned int length) {
@@ -253,10 +265,7 @@ void callback(char* topic, byte* message, unsigned int length) {
   }
   if (String(topic) == ACK_Topic) {                                                     // se arriva il comando sul topic "ACK"
     if ((char)message[0] == 'a' & (char)message[1] == 'c' & (char)message[2] == 'k' ) { // Topic "ack" = "ack"
-      payload = macToStr(mac);
-      payload += " alive! ";
-      payload += Tapparella_Topic;
-      client.publish(ACK_Topic, (char*) payload.c_str());
+      Send_ACK();
       delay(100);
     }
   }
