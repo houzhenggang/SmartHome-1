@@ -1,8 +1,11 @@
 # SmartHome
 
 Casa domotica per ESP8266 basato sul protocollo MQTT.
+
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.
+
 Ogni nodo, deve avere un nome univoco (topic) per comunicare con il broker MQTT e quindi con l'app Android.
+
 Inviando i comandi al nodo (topic), il nodo risponderà sul topic "ack"
 
 ## SmartHome tapparella V 1.0
