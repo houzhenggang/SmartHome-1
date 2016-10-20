@@ -16,24 +16,26 @@
 #include <EEPROM.h>
 
 // MQTT server
-const char* ssid          = "wifi_ssid";      // WIFI SSID
-const char* password      = "wifi_password";  // WIFI password
-const char* mqtt_server   = "mqtt_server";    // MQTT server
-const char* mqtt_user     = "mqtt_user";      // MQTT user
-const char* mqtt_password = "mqtt_password";  // MQTT password
-const int   mqtt_port     = mqtt_port;        // MQTT port
+const char* ssid          = "WIFI SSID";          // WIFI SSID
+const char* password      = "WIFI password";      // WIFI password
+const char* mqtt_server   = "MQTT server";        // MQTT server
+const char* mqtt_user     = "MQTT user";          // MQTT user
+const char* mqtt_password = "MQTT password";      // MQTT password
+const int   mqtt_port     =  MQTT_port;           // MQTT port
 
 // DEBUG
-//#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
+#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
 
 // HARDWARE
 //#define ESP01                                     // Commentare l'hardware non corrente
-//#define NODEMCU                                   // Commentare l'hardware non corrente
-#define ELECTRODRAGON                             // Commentare l'hardware non corrente
+#define NODEMCU                                   // Commentare l'hardware non corrente
+//#define ELECTRODRAGON                             // Commentare l'hardware non corrente
+
+// Tipo nodo
 #define TIPO_NODO         "TAP"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
 
 // MQTT topic
-#define Tapparella_Topic  "tapparella_prototipo"  // Tapparella_Topic
+#define Tapparella_Topic  "tapparella_1"            // Tapparella_Topic
 #define ACK_Topic         "ack"                   // ACK_Topic
 
 // TEMPI

@@ -10,6 +10,7 @@
   2on           -> comando ON 2
   2off          -> comando OFF 2
   stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
+  read          -> legge la temperatura
   reset         -> pulisce la memoria EEPROM e resetta l'ESC
 */
 
@@ -21,50 +22,60 @@
 #include "SSD1306.h"
 
 // MQTT server
-const char* ssid          = "wifi_ssid";      // WIFI SSID
-const char* password      = "wifi_password";  // WIFI password
-const char* mqtt_server   = "mqtt_server";    // MQTT server
-const char* mqtt_user     = "mqtt_user";      // MQTT user
-const char* mqtt_password = "mqtt_password";  // MQTT password
-const int   mqtt_port     = mqtt_port;        // MQTT port
+const char* ssid          = "WIFI SSID";          // WIFI SSID
+const char* password      = "WIFI password";      // WIFI password
+const char* mqtt_server   = "MQTT server";        // MQTT server
+const char* mqtt_user     = "MQTT user";          // MQTT user
+const char* mqtt_password = "MQTT password";      // MQTT password
+const int   mqtt_port     =  MQTT_port;           // MQTT port
 
 // DEBUG
 #define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
 
 // HARDWARE
-//#define ESP01                                     // Commentare l'hardware non corrente
-//#define NODEMCU                                   // Commentare l'hardware non corrente
-#define ELECTRODRAGON                             // Commentare l'hardware non corrente
-#define TIPO_NODO         "TEM"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
-#define DHTTYPE DHT22                             // DHT 22  (AM2302)
+//#define ESP01                                    // Commentare l'hardware non corrente
+#define NODEMCU                                   // Commentare l'hardware non corrente
+//#define ELECTRODRAGON                            // Commentare l'hardware non corrente
+
+// Tipo nodo
+#define TIPO_NODO                   "TEM"         // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
+
+// Sensore temperatura
+#define DHTTYPE                     DHT22         // DHT 22  (AM2302)
 
 // MQTT topic
-#define ACK_Topic         "ack"
-#define Temperatura_Topic  "temperatura_prototipo"
+#define ACK_Topic                   "ack"
+#define Temperatura_Topic           "temperatura_1"
 
 // TEMPI
 #define MAX_RET_WIFI                20            // Indica per quante volte ritenta di connettersi al WIFI
-#define MAX_RET_MQTT                3             // Indica per quante volte ritenta di connettersi al server MQTT
+#define MAX_RET_MQTT                2             // Indica per quante volte ritenta di connettersi al server MQTT
 #define TEMPO_REFRESH_CONNESSIONE   60000         // Indica il timeout di refresh della connessione (60000=1 min.)
 #define TEMPO_RELE                  200           // Indica il tempo tra una commutazione RELE e la successiva
-#define TEMPO_TERMOSTATO            5000          // Indica il tempo 
+#define TEMPO_TERMOSTATO            5000          // Indica il tempo di refresh del termostato in AUTO
 
 // GPIO
-#if defined(ESP01)
+#if defined(ESP01)  //  GPIO spenti -> 4 5 12 13 14 15
 #define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
 #define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
-#define Status_LED BUILTIN_LED    //BUILTIN_LED -> GPIO16 (nodemcu) , GPIO1 (ESP01 TX)
-#define RELE1_temperatura 14      // GPIO14
-#define RELE2_temperatura 12      // GPIO12
-#define DHTPIN 2                  // GPIO2
+#define Status_LED                  4             // spento
+#define RELE1_temperatura           0             // GPIO0
+#define RELE2_temperatura           5             // spento
+#define DHTPIN                      2             // GPIO2
+#define I2C_DISPLAY_ADDRESS         0x3c          // Display I2C address
+#define SDA_PIN                     1             // GPIO1 Display SDA
+#define SDC_PIN                     3             // GPIO3 Display SDC
 #endif
-#if defined(NODEMCU)
+#if defined(NODEMCU)             // OK
 #define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
-#define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
-#define Status_LED BUILTIN_LED    //BUILTIN_LED -> GPIO16 (nodemcu) , GPIO1 (ESP01 TX)
-#define RELE1_temperatura 14      // GPIO14
-#define RELE2_temperatura 12      // GPIO12
-#define DHTPIN 2                  // GPIO2
+#define Flag_inversione_Status_LED  0             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
+#define Status_LED                  BUILTIN_LED   //BUILTIN_LED -> GPIO16 (nodemcu) , GPIO1 (ESP01 TX)
+#define RELE1_temperatura           14            // GPIO14 (D5)
+#define RELE2_temperatura           12            // GPIO12 (D6)
+#define DHTPIN                      2             // GPIO2 (D4)
+#define I2C_DISPLAY_ADDRESS         0x3c          // Display I2C address
+#define SDA_PIN                     4             // GPIO4 (D2) Display SDA
+#define SDC_PIN                     5             // GPIO5 (D1) Display SDC
 #endif
 #if defined(ELECTRODRAGON)       // OK
 #define Flag_inversione_RELE        0             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
@@ -73,6 +84,9 @@ const int   mqtt_port     = mqtt_port;        // MQTT port
 #define RELE1_temperatura           13            // GPIO13
 #define RELE2_temperatura           12            // GPIO12
 #define DHTPIN                      14            // GPIO14
+#define I2C_DISPLAY_ADDRESS         0x3c          // Display I2C address
+#define SDA_PIN                     4             // GPIO4 Display SDA
+#define SDC_PIN                     5             // GPIO5 Display SDC
 #endif
 
 // VARIABILI
@@ -84,19 +98,6 @@ float       hi;                             // Heat index in Celsius (isFahrehei
 float       soglia = 0.25;                  // +/- 0.25
 float       termostato = 18.00;
 boolean     AUTO = false;
-
-
-
-
-
-
-
-// Display Settings
-const int I2C_DISPLAY_ADDRESS = 0x3c;
-const int SDA_PIN = D2;
-const int SDC_PIN = D1;
-//const int SDA_PIN = 2;
-//const int SDC_PIN = 1;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -114,7 +115,9 @@ void setup() {
   Serial.println("RELE1           = GPIO" + String(RELE1_temperatura));
   Serial.println("RELE2           = GPIO" + String(RELE2_temperatura));
   Serial.println("DTH22           = GPIO" + String(DHTPIN));
-  Serial.println("SSD1306 ADDRESS = " + String(I2C_DISPLAY_ADDRESS));
+  Serial.println("SSD1306 ADDRESS = 0x"   + String(I2C_DISPLAY_ADDRESS, HEX));
+  Serial.println("SDA             = GPIO" + String(SDA_PIN));
+  Serial.println("SDC             = GPIO" + String(SDC_PIN));
 
   // Inizializza EEPROM
   EEPROM.begin(512);
@@ -258,37 +261,38 @@ void callback(char* topic, byte* message, unsigned int length) {
       delay(50);
     }
     if ((char)message[0] == '1' & (char)message[1] == 'o' & (char)message[2] == 'n' ) {                                 // Topic "temperatura" = "1on"
-      digitalWrite(RELE1_temperatura, 1 ^ Flag_inversione_RELE);                                                             // Accendo il RELE1
+      digitalWrite(RELE1_temperatura, 1 ^ Flag_inversione_RELE);                                                        // Accendo il RELE1
       delay(TEMPO_RELE);                                                                                                // Aspetto
     }
     if ((char)message[0] == '1' & (char)message[1] == 'o' & (char)message[2] == 'f' & (char)message[3] == 'f' ) {       // Topic "temperatura" = "1off"
-      digitalWrite(RELE1_temperatura, 0 ^ Flag_inversione_RELE);                                                             // Spengo il RELE1
+      digitalWrite(RELE1_temperatura, 0 ^ Flag_inversione_RELE);                                                        // Spengo il RELE1
       delay(TEMPO_RELE);                                                                                                // Aspetto
     }
     if ((char)message[0] == '2' & (char)message[1] == 'o' & (char)message[2] == 'n' ) {                                 // Topic "temperatura" = "2on"
-      digitalWrite(RELE2_temperatura, 1 ^ Flag_inversione_RELE);                                                             // Accendo il RELE2
+      digitalWrite(RELE2_temperatura, 1 ^ Flag_inversione_RELE);                                                        // Accendo il RELE2
       delay(TEMPO_RELE);                                                                                                // Aspetto
     }
     if ((char)message[0] == '2' & (char)message[1] == 'o' & (char)message[2] == 'f' & (char)message[3] == 'f' ) {       // Topic "temperatura" = "2off"
-      digitalWrite(RELE2_temperatura, 0 ^ Flag_inversione_RELE);                                                             // Spengo il RELE2
+      digitalWrite(RELE2_temperatura, 0 ^ Flag_inversione_RELE);                                                        // Spengo il RELE2
       delay(TEMPO_RELE);                                                                                                // Aspetto
     }
-    if ((char)message[0] == 'T' & (char)message[1] == '=' ) {                                                           // Topic "temperatura" = "T="
+    if (((char)message[0] == 'T' or (char)message[0] == 't') &
+        (char)message[1] == '=' ) {                                                                                     // Topic "temperatura" = "T=" o "t="
       String stringtmp = "";
       for (int i = 2; i < length; i++)  {
         stringtmp = stringtmp + (char)message[i];
       }
-      stringtmp = stringtmp + ".0";
-      char buf[stringtmp.length()];
-      stringtmp.toCharArray(buf, stringtmp.length());
-      termostato = atof(buf);
+      Serial.println(stringtmp);
+      termostato = stringtmp.toFloat();
+      Serial.println(termostato);
       EEPROM_write();
     }
-    if ((char)message[0] == 's' & (char)message[1] == 't' & (char)message[2] == 'a' & (char)message[3] == 't' & (char)message[4] == 'o' ) {       // Topic "temperatura" = "stato"
+    if ((char)message[0] == 's' & (char)message[1] == 't' & (char)message[2] == 'a' &
+        (char)message[3] == 't' & (char)message[4] == 'o' ) {                                                           // Topic "temperatura" = "stato"
       payload = macToStr(mac);
       payload += " T=";
-      char tmp[4];              // string buffer
-      String stringtmp = "";      //data on buff is copied to this string
+      char tmp[4];                            // string buffer
+      String stringtmp = "";                  //data on buff is copied to this string
       dtostrf(termostato, 4, 1, tmp);
       for (int i = 0; i < sizeof(tmp); i++)  {
         stringtmp += tmp[i];
@@ -313,7 +317,8 @@ void callback(char* topic, byte* message, unsigned int length) {
       AUTO = false;
       EEPROM_write();
     }
-    if ((char)message[0] == 'r' & (char)message[1] == 'e' & (char)message[2] == 's' & (char)message[3] == 'e' & (char)message[4] == 't' ) {  // Topic "temperatura" = "reset"
+    if ((char)message[0] == 'r' & (char)message[1] == 'e' & (char)message[2] == 's' &
+        (char)message[3] == 'e' & (char)message[4] == 't' ) {                                                           // Topic "temperatura" = "reset"
       EEPROM_clear_reset();
     }
   }
@@ -330,9 +335,9 @@ void callback(char* topic, byte* message, unsigned int length) {
 void sendTemperature() {
   h = dht.readHumidity();
   delay(50);
-  t = dht.readTemperature(false);                     // Read temperature as Celsius (the default)
+  t = dht.readTemperature(false);                           // Read temperature as Celsius (the default)
   delay(50);
-  f = dht.readTemperature(true);                      // Read temperature as Fahrenheit (isFahrenheit = true)
+  f = dht.readTemperature(true);                            // Read temperature as Fahrenheit (isFahrenheit = true)
 
   if (isnan(h) || isnan(t) || isnan(f)) {                   // Check if any reads failed and exit early (to try again).
     String payload = macToStr(mac);
@@ -341,7 +346,7 @@ void sendTemperature() {
     client.publish(ACK_Topic, (char*) payload.c_str());
     return;
   }
-  hi = dht.computeHeatIndex(t, h, false);             // Compute heat index in Celsius (isFahreheit = false) float hi
+  hi = dht.computeHeatIndex(t, h, false);                   // Compute heat index in Celsius (isFahreheit = false) float hi
   Serial.print("Humidity: ");
   Serial.print(h);
   Serial.print(" % ");
@@ -423,11 +428,11 @@ void loop() {
     }
     if (AUTO) {
       if (t < (termostato - soglia)) {
-        digitalWrite(RELE1_temperatura, 1 ^ Flag_inversione_RELE);                                                             // Accendo il RELE1
+        digitalWrite(RELE1_temperatura, 1 ^ Flag_inversione_RELE);                                                        // Accendo il RELE1
         delay(TEMPO_RELE);                                                                                                // Aspetto
       }
       if (t > (termostato + soglia)) {
-        digitalWrite(RELE1_temperatura, 0 ^ Flag_inversione_RELE);                                                             // Spengo il RELE1
+        digitalWrite(RELE1_temperatura, 0 ^ Flag_inversione_RELE);                                                        // Spengo il RELE1
         delay(TEMPO_RELE);                                                                                                // Aspetto
       }
     }
@@ -499,57 +504,78 @@ void EEPROM_clear_reset() {
 }
 
 void EEPROM_read() {
-  Serial.print("Reading EEPROM termostato: ");
-  String stringtmp = "";
-  float termostatotmp;
-  for (int i = 0; i < 5; ++i)
-  {
-    stringtmp += char(EEPROM.read(i));
-  }
-  char buf[stringtmp.length()];
-  stringtmp.toCharArray(buf, stringtmp.length());
-  termostatotmp = atof(buf);
-  Serial.println(termostatotmp);
+  int address = 10;
+  int tmp;
   Serial.print("Reading EEPROM MAN/AUTO: ");
-  stringtmp = "";
-  for (int i = 5; i < 9; ++i)
-  {
-    stringtmp += char(EEPROM.read(i));
-  }
-  Serial.println(stringtmp);
-  if (stringtmp == "AUTO") {
+  tmp = eepromReadInt(address);
+  if (tmp == 1) {
     AUTO = true;
+    Serial.println("AUTO");
   }
-  else {
-    AUTO = false ;
+  if (tmp == 0) {
+    AUTO = false;
+    Serial.println("MAN");
   }
-  if (termostatotmp > 5)  {
-    termostato = termostatotmp;
+  if ((tmp != 1 and tmp != 0) or isnan(tmp)) {
+    AUTO = false;
+    Serial.println("MAN");
   }
+  address = 12;
+  Serial.print("Reading EEPROM termostato: ");
+  termostato = eepromReadFloat(address);
+  if (termostato<2 or termostato>30 or isnan(termostato)) termostato = 18;
+  Serial.println(termostato);
 }
 
 void EEPROM_write() {
-  char tmp[4];                                                        // string buffer
-  String stringtmp = "";                                              //data on buff is copied to this string
-  dtostrf(termostato, 4, 1, tmp);
-  for (int i = 0; i < sizeof(tmp); i++)  {
-    stringtmp += tmp[i];
+  int address = 10;
+  Serial.print("Writing MAN/AUTO:");
+  if (AUTO == true) {
+    int tmp = 1;
+    eepromWriteInt(address, tmp);
+    Serial.println("AUTO");
   }
-  Serial.println("writing EEPROM termostato:");
-  for (int i = 0; i < 5; ++i)
-  {
-    EEPROM.write(i, stringtmp[i]);
-    Serial.print("Wrote: ");
-    Serial.println(stringtmp[i]);
+  if (AUTO == false) {
+    int tmp = 0;
+    eepromWriteInt(address, tmp);
+    Serial.println("MAN");
   }
-  Serial.println("writing EEPROM MAN/AUTO:");
-  if (AUTO == true) stringtmp = "AUTO";
-  else stringtmp = "MAN ";
-  for (int i = 0; i < 4; ++i)
-  {
-    EEPROM.write(i + 5, stringtmp[i]);
-    Serial.print("Wrote: ");
-    Serial.println(stringtmp[i]);
-  }
+  address = 12;
+  Serial.print("Writing TERMOSTATO:");
+  Serial.println(termostato);
+  eepromWriteFloat(address, termostato);
   EEPROM.commit();
+}
+
+int eepromReadInt(int address) {
+  int value = 0x0000;
+  value = value | (EEPROM.read(address) << 8);
+  value = value | EEPROM.read(address + 1);
+  return value;
+}
+void eepromWriteInt(int address, int value) {
+  EEPROM.write(address, (value >> 8) & 0xFF );
+  EEPROM.write(address + 1, value & 0xFF);
+}
+float eepromReadFloat(int address) {
+  union u_tag {
+    byte b[4];
+    float fval;
+  } u;
+  u.b[0] = EEPROM.read(address);
+  u.b[1] = EEPROM.read(address + 1);
+  u.b[2] = EEPROM.read(address + 2);
+  u.b[3] = EEPROM.read(address + 3);
+  return u.fval;
+}
+void eepromWriteFloat(int address, float value) {
+  union u_tag {
+    byte b[4];
+    float fval;
+  } u;
+  u.fval = value;
+  EEPROM.write(address  , u.b[0]);
+  EEPROM.write(address + 1, u.b[1]);
+  EEPROM.write(address + 2, u.b[2]);
+  EEPROM.write(address + 3, u.b[3]);
 }

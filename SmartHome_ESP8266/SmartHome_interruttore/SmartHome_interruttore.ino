@@ -16,12 +16,12 @@
 #include <EEPROM.h>
 
 // MQTT server
-const char* ssid          = "wifi_ssid";      // WIFI SSID
-const char* password      = "wifi_password";  // WIFI password
-const char* mqtt_server   = "mqtt_server";    // MQTT server
-const char* mqtt_user     = "mqtt_user";      // MQTT user
-const char* mqtt_password = "mqtt_password";  // MQTT password
-const int   mqtt_port     = mqtt_port;        // MQTT port
+const char* ssid          = "WIFI SSID";          // WIFI SSID
+const char* password      = "WIFI password";      // WIFI password
+const char* mqtt_server   = "MQTT server";        // MQTT server
+const char* mqtt_user     = "MQTT user";          // MQTT user
+const char* mqtt_password = "MQTT password";      // MQTT password
+const int   mqtt_port     =  MQTT_port;           // MQTT port
 
 // DEBUG
 #define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
@@ -30,10 +30,12 @@ const int   mqtt_port     = mqtt_port;        // MQTT port
 //#define ESP01                                     // Commentare l'hardware non corrente
 #define NODEMCU                                   // Commentare l'hardware non corrente
 //#define ELECTRODRAGON                             // Commentare l'hardware non corrente
+
+// Tipo nodo
 #define TIPO_NODO         "INT"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
 
 // MQTT topic
-#define Interruttore_Topic  "interruttore_prototipo"        // Interruttore_Topic
+#define Interruttore_Topic  "interruttore_1"        // Interruttore_Topic
 #define ACK_Topic           "ack"                 // ACK_Topic
 
 // TEMPI
@@ -283,11 +285,24 @@ void loop() {
   client.loop();
 }
 
+/*
+  int eepromReadInt(int address) {
+  int value = 0x0000;
+  value = value | (EEPROM.read(address) << 8);
+  value = value | EEPROM.read(address + 1);
+  return value;
+  }
+  void eepromWriteInt(int address, int value) {
+  EEPROM.write(address, (value >> 8) & 0xFF );
+  EEPROM.write(address + 1, value & 0xFF);
+  }
+
+*/
 int EEPROM_read_rele1() {                                              // Leggo dalla EEPROM RELE 1
   int tmp;
-  long address = 4;
+  long address = 20;
   Serial.print("Reading EEPROM RELE 1 : ");
-  tmp = EEPROM.read(address);
+  tmp = eepromReadInt(address);
   if (tmp != 0 && tmp != 1) tmp = 0;
   if (tmp == 1) Serial.println("ON");
   if (tmp == 0) Serial.println("OFF");
@@ -295,16 +310,16 @@ int EEPROM_read_rele1() {                                              // Leggo 
 }
 
 void EEPROM_write_rele1() {                                              // Scrivo sulla EEPROM RELE 1
-  long address = 4;
+  long address = 20;
   Serial.print("Writing EEPROM RELE 1 :");
   if (digitalRead(RELE_1) ^ Flag_inversione_RELE == true ) {
     int tmp = 1;
-    EEPROM.write(address, tmp );
+    eepromWriteInt(address, tmp );
     Serial.println("ON");
   }
   if (digitalRead(RELE_1) ^ Flag_inversione_RELE == false) {
     int tmp = 0;
-    EEPROM.write(address,  tmp );
+    eepromWriteInt(address,  tmp );
     Serial.println("OFF");
   }
   EEPROM.commit();
@@ -312,9 +327,9 @@ void EEPROM_write_rele1() {                                              // Scri
 
 int EEPROM_read_rele2() {                                              // Leggo dalla EEPROM RELE 2
   int tmp;
-  long address = 5;
+  int address = 22;
   Serial.print("Reading EEPROM RELE 2 : ");
-  tmp = EEPROM.read(address);
+  tmp = eepromReadInt(address);
   if (tmp != 0 && tmp != 1) tmp = 0;
   if (tmp == 1) Serial.println("ON");
   if (tmp == 0) Serial.println("OFF");
@@ -322,16 +337,16 @@ int EEPROM_read_rele2() {                                              // Leggo 
 }
 
 void EEPROM_write_rele2() {                                              // Scrivo sulla EEPROM RELE 2
-  long address = 5;
+  int address = 22;
   Serial.print("Writing EEPROM RELE 2 :");
   if (digitalRead(RELE_2) ^ Flag_inversione_RELE == true) {
     int tmp = 1;
-    EEPROM.write(address,  tmp );
+    eepromWriteInt(address,  tmp );
     Serial.println("ON");
   }
   if (digitalRead(RELE_2) ^ Flag_inversione_RELE == false) {
     int tmp = 0;
-    EEPROM.write(address,  tmp );
+    eepromWriteInt(address,  tmp );
     Serial.println("OFF");
   }
   EEPROM.commit();
@@ -398,4 +413,14 @@ String getTime() {
       }
     }
   }
+}
+int eepromReadInt(int address) {
+  int value = 0x0000;
+  value = value | (EEPROM.read(address) << 8);
+  value = value | EEPROM.read(address + 1);
+  return value;
+}
+void eepromWriteInt(int address, int value) {
+  EEPROM.write(address, (value >> 8) & 0xFF );
+  EEPROM.write(address + 1, value & 0xFF);
 }
