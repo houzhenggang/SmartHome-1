@@ -22,7 +22,7 @@ t=XX o T=XX   -> XX Indica per quanto tempo la tapparella può restare in azione
 
 stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
 
-reset         -> pulisce la memoria EEPROM e re
+reset         -> pulisce la memoria EEPROM e resetta l'ESP
 
 # SmartHome temperatura V 1.0
 
@@ -46,7 +46,7 @@ stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo
 
 read          -> legge la temperatura
 
-reset         -> pulisce la memoria EEPROM e resetta l'ESC
+reset         -> pulisce la memoria EEPROM e resetta l'ESP
 
 # SmartHome interruttore V 1.0
 
@@ -62,4 +62,4 @@ Comandi da inviare al topic "Interruttore_Topic":
 
 stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
 
-reset         -> pulisce la memoria EEPROM e resetta l'ESC
+reset         -> pulisce la memoria EEPROM e resetta l'ESP
