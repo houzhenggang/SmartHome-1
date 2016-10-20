@@ -4,9 +4,6 @@ Casa domotica per ESP8266 basato sul protocollo MQTT.
 
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.
 
-
-
-
 SmartHome tapparella V 1.0
 
 Comandi da inviare al topic "Tapparella_Topic":
@@ -22,9 +19,6 @@ t=XX o T=XX   -> XX Indica per quanto tempo la tapparella può restare in azione
 stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
 
 reset         -> pulisce la memoria EEPROM e re
-
-
-
 
 SmartHome temperatura V 1.0
 
@@ -50,9 +44,6 @@ read          -> legge la temperatura
 
 reset         -> pulisce la memoria EEPROM e resetta l'ESC
 
-
-
-
 SmartHome interruttore V 1.0
 
 Comandi da inviare al topic "Interruttore_Topic":
@@ -68,5 +59,3 @@ Comandi da inviare al topic "Interruttore_Topic":
 stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
 
 reset         -> pulisce la memoria EEPROM e resetta l'ESC
-
-
