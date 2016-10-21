@@ -23,10 +23,10 @@ Comandi da inviare al topic "Tapparella_Topic":
 ## SmartHome temperatura V 1.0
 
 Il nodo "temperatura" serve per comandare apparecchiature per il riscaldamento.  
-1 GPIO viene usato per la sonda di temperatura e umidità.  
+1 GPIO viene usato per la sonda di temperatura e umidità (DHT22).  
 1 GPIO viene usato per comandare il relè termostato (se impostato in AUTO, funziona come un normale termostato, se impostato in MAN, lo si può commutare a piacere).  
 1 GPIO viene usato per comandare un relè liberamente gestibile dall'utente.  
-2 GPIO vengono usati per interfacciare un display I2C.  
+2 GPIO vengono usati per interfacciare un display I2C (SSD1306).  
 
 Comandi da inviare al topic "Temperatura_Topic":
 
