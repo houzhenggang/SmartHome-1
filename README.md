@@ -1,5 +1,4 @@
-# SmartHome
-
+# SmartHome: 
 Casa domotica per ESP8266 basato sul protocollo MQTT.
 
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.
