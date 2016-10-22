@@ -34,10 +34,10 @@ Comandi da inviare al topic "Temperatura_Topic":
     man           -> Imposta il termostato in "manuale"
     auto          -> Imposta il termostato in "automatico"
     t=XX o T=XX   -> Imposta il termostato alla temperatura XX
-    1on           -> relè 1 ON
-    1off          -> relè 1 OFF
-    2on           -> relè 2 ON
-    2off          -> relè 2 OFF
+    1on           -> Imposta il relè 1 a ON
+    1off          -> Imposta il relè 1 a OFF
+    2on           -> Imposta il relè 2 a ON
+    2off          -> Imposta il relè 2 a OFF
     stato         -> restituisce sul topic ACK lo stato dei relè la temperatura impostata e lo stato del termostato
     read          -> legge la temperatura
     reset         -> pulisce la memoria EEPROM e resetta l'ESP
@@ -49,9 +49,9 @@ Il nodo "interruttore" serve per comandare luci o prese.
 
 Comandi da inviare al topic "Interruttore_Topic":
 
-    1on           -> relè 1 ON  
-    1off          -> relè 1 OFF  
-    2on           -> relè 2 ON  
-    2off          -> relè 2 OFF  
+    1on           -> Imposta il relè 1 a ON  
+    1off          -> Imposta il relè 1 a OFF  
+    2on           -> Imposta il relè 2 a ON  
+    2off          -> Imposta il relè 2 a OFF  
     stato         -> restituisce sul topic ACK lo stato dei relè  
     reset         -> pulisce la memoria EEPROM e resetta l'ESP  
