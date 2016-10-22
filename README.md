@@ -49,9 +49,9 @@ Comandi da inviare al topic "Interruttore_Topic":
 Il nodo "interruttore" serve per comandare luci o prese.  
 * 2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
 
-    1on           -> comando ON 1
-    1off          -> comando OFF 1
-    2on           -> comando ON 2
-    2off          -> comando OFF 2
-    stato         -> restituisce sul topic ACK lo stato dei relè
-    reset         -> pulisce la memoria EEPROM e resetta l'ESP
+    1on           -> comando ON 1  
+    1off          -> comando OFF 1  
+    2on           -> comando ON 2  
+    2off          -> comando OFF 2  
+    stato         -> restituisce sul topic ACK lo stato dei relè  
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP  
