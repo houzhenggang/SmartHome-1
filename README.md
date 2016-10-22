@@ -30,7 +30,7 @@ GPIO 1 is used to control a relay freely manageable by the user.
 
 Commands to be sent to the topic "Temperatura_Topic":
 
-    man -> Set the thermostat in the "manual"  
+    man -> Set the thermostat in the "manual"  
     Auto -> Set the thermostat in the "auto"  
     t=XX o T=XX -> Set the thermostat to the temperature XX  
     1on -> ON 1 command  
