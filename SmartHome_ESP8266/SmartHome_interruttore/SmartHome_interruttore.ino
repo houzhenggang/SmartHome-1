@@ -6,7 +6,7 @@
   1off          -> comando OFF 1
   2on           -> comando ON 2
   2off          -> comando OFF 2
-  stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
+  stato         -> restituisce sul topic ACK lo stato dei relè
   reset         -> pulisce la memoria EEPROM e resetta l'ESC
 */
 
