@@ -1,4 +1,4 @@
-# SmartHome: House Ambient ESP8266 based on MQTT protocol.
+# SmartHome: Domotic house  ESP8266 based on MQTT protocol.
 
 The project is divided into nodes: shutter nodes, temperature nodes and switch nodes.
 Each node communicates through MQTT protocol with the broker, which can be local (LAN) or remote (Internet). To interact with individual nodes need to send specific commands to the node (identified by a unique MQTT topic).
