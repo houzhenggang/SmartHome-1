@@ -30,7 +30,7 @@ const char* mqtt_password = "MQTT password";      // MQTT password
 const int   mqtt_port     =  MQTT_port;           // MQTT port
 
 // DEBUG
-#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
+#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG 
 
 // HARDWARE
 //#define ESP01                                    // Commentare l'hardware non corrente
