@@ -1,14 +1,14 @@
 # SmartHome: Domotic house  ESP8266 based on MQTT protocol.
 
-The project is divided into nodes: shutter nodes, temperature nodes and switch nodes.
-Each node communicates through MQTT protocol with the broker, which can be local (LAN) or remote (Internet). To interact with individual nodes need to send specific commands to the node (identified by a unique MQTT topic).
-By sending commands to the node (topic), he interacts with it, making him do the operations or questioning. The node will respond on the topic "ack".
+The project is divided into nodes: shutter nodes, temperature nodes and switch nodes.  
+Each node communicates through MQTT protocol with the broker, which can be local (LAN) or remote (Internet). To interact with individual nodes, you have to send specific commands to the node (identified by a unique MQTT topic).  
+By sending commands to the node (topic), you'll be interacting with it, making him do the operations or questioning. The node will respond on the topic "ack".  
 In the "Android" folder is an app (still in beta) from where the can handle the various nodes.
 
 ## SmartHome tapparella V 1.0
 
 The "shutter" node is used to control blinds or shutters.
-GPIO 2 are used for control of relay 2 (1 Enable 1 and the reversing) for the movement of the shutter.
+2 GPIO are used for control of 2 relays (1 enable and 1 reversing) for the movement of the shutter.
 2 GPIO are used as physical inputs from buttons to directly control the movement of the shutter.
 
 Commands to be sent to the topic "Tapparella_Topic":
@@ -23,9 +23,9 @@ Commands to be sent to the topic "Tapparella_Topic":
 ## SmartHome temperatura V 1.0
 
 The "temperature" node is used to control equipment for heating.
-GPIO 1 is used for the temperature and humidity probe (DHT22).
-1 GPIO is used to control the thermostat relay (if set to AUTO, it works as a normal thermostat, when set to MAN, you can switch at will).
-GPIO 1 is used to control a relay freely manageable by the user.
+1 GPIO is used for the temperature and humidity probe (DHT22).
+1 GPIO is used to control the thermostat relay (if set to AUTO, it works as a normal thermostat, when set to MAN, you can switch it manually).
+1 GPIO is used to control a relay freely manageable by the user.
 2 GPIO are used to interface to an I2C display (SSD1306).
 
 Commands to be sent to the topic "Temperatura_Topic":
