@@ -1,7 +1,7 @@
 /*
   SmartHome tapparella V 1.0
 
-  Comandi da inviare al topic "Tapparella_Topic":
+  Comandi da inviare al topic "Tapparella_Topic": 
   su            -> comando SU
   giu           -> comando GIU
   stop          -> comando STOP
