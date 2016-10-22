@@ -3,7 +3,7 @@
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.  
 Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet). Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco).  
 Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
-Nella cartella "Android" è presente un'app (ancora in versione beta) dalla quale di possono gestire i vari nodi.  
+Nella cartella "Android" è presente un'app (ancora in versione beta) dalla quale di possono gestire i vari nodi. A breve sarà disponibile nel Google Play store (https://play.google.com/apps/testing/roncoa.SmartHome)  
 
 ## SmartHome tapparella V 1.0
 
