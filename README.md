@@ -44,10 +44,10 @@ Comandi da inviare al topic "Temperatura_Topic":
 
 ## SmartHome interruttore V 1.0
 
-Comandi da inviare al topic "Interruttore_Topic":
-
 Il nodo "interruttore" serve per comandare luci o prese.  
 * 2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
+
+Comandi da inviare al topic "Interruttore_Topic":
 
     1on           -> comando ON 1  
     1off          -> comando OFF 1  
