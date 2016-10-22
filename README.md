@@ -14,11 +14,11 @@ GPIO 2 are used for control of relay 2 (1 Enable 1 and the reversing) for the mo
 Commands to be sent to the topic "Tapparella_Topic":
 
     su -> UP command  
-    giu -> DOWN command  
-    stop -> STOP command  
-    t=XX o T=XX -> XX Indicates how long the shutter can remain in action (in sec.)  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    giu -> DOWN command  
+    stop -> STOP command  
+    t=XX o T=XX -> XX Indicates how long the shutter can remain in action (in sec.)  
+    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    reset -> cleans the EEPROM memory and resets the ESP  
 
 ## SmartHome temperatura V 1.0
 
@@ -31,15 +31,15 @@ GPIO 1 is used to control a relay freely manageable by the user.
 Commands to be sent to the topic "Temperatura_Topic":
 
     man -> Set the thermostat in the "manual"  
-    Auto -> Set the thermostat in the "auto"  
-    t=XX o T=XX -> Set the thermostat to the temperature XX  
-    1on -> ON 1 command  
-    1off -> command OFF 1  
-    2on -> ON 2 command  
-    2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    read -> reads temperature  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    Auto -> Set the thermostat in the "auto"  
+    t=XX o T=XX -> Set the thermostat to the temperature XX  
+    1on -> ON 1 command  
+    1off -> command OFF 1  
+    2on -> ON 2 command  
+    2off -> OFF 2 command  
+    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    read -> reads temperature  
+    reset -> cleans the EEPROM memory and resets the ESP  
 
 ## SmartHome interruttore V 1.0
 
@@ -48,9 +48,9 @@ Commands to be sent to the topic "Interruttore_Topic":
 The "switch" node is used to control lights or sockets.
 2 GPIO are used for controlling 2 relay freely managed by the user.
 
-    1on -> ON 1 command  
-    1off -> command OFF 1  
-    2on -> ON 2 command  
-    2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    1on -> ON 1 command  
+    1off -> command OFF 1  
+    2on -> ON 2 command  
+    2off -> OFF 2 command  
+    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    reset -> cleans the EEPROM memory and resets the ESP  
