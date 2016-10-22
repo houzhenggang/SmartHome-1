@@ -37,7 +37,7 @@ Commands to be sent to the topic "Temperatura_Topic":
     1off -> command OFF 1  
     2on -> ON 2 command  
     2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    stato -> returns the ACK topic relay status and thermostat  
     read -> reads temperature  
     reset -> cleans the EEPROM memory and resets the ESP  
 
@@ -52,5 +52,5 @@ The "switch" node is used to control lights or sockets.
     1off -> command OFF 1  
     2on -> ON 2 command  
     2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    stato -> returns the ACK topic relay status   
     reset -> cleans the EEPROM memory and resets the ESP  
