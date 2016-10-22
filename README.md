@@ -1,56 +1,56 @@
-# SmartHome: Domotic house  ESP8266 based on MQTT protocol.
+# SmartHome: Casa domotica per ESP8266 basato sul protocollo MQTT.
 
-The project is divided into nodes: shutter nodes, temperature nodes and switch nodes.  
-Each node communicates through MQTT protocol with the broker, which can be local (LAN) or remote (Internet). To interact with individual nodes, you have to send specific commands to the node (identified by a unique MQTT topic).  
-By sending commands to the node (topic), you'll be interacting with it, making him do the operations or questioning. The node will respond on the topic "ack".  
-In the "Android" folder is an app (still in beta) from where the can handle the various nodes.
+Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.  
+Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet). Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco).  
+Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
+Nella cartella "Android" è presente un'app (ancora in versione beta) dalla quale di possono gestire i vari nodi.  
 
 ## SmartHome tapparella V 1.0
 
-The "shutter" node is used to control blinds or shutters.
-2 GPIO are used for control of 2 relays (1 enable and 1 reversing) for the movement of the shutter.
-2 GPIO are used as physical inputs from buttons to directly control the movement of the shutter.
+Il nodo "tapparella" serve per comandare tapparelle o serrande.  
+2 GPIO vengono usati per comandare 2 relè (1 di abilitazione e 1 di inversione del movimento) per il movimento della tapparella.  
+2 GPIO vengono usati come ingressi fisici da pulsanti per comandare direttamente il movimento della tapparella.  
 
-Commands to be sent to the topic "Tapparella_Topic":
+Comandi da inviare al topic "Tapparella_Topic":
 
-    su -> UP command  
-    giu -> DOWN command  
-    stop -> STOP command  
-    t=XX o T=XX -> XX Indicates how long the shutter can remain in action (in sec.)  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    su            -> comando SU
+    giu           -> comando GIU
+    stop          -> comando STOP
+    t=XX o T=XX   -> XX Indica per quanto tempo la tapparella può restare in azione (in sec.)
+    stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP
 
 ## SmartHome temperatura V 1.0
 
-The "temperature" node is used to control equipment for heating.
-1 GPIO is used for the temperature and humidity probe (DHT22).
-1 GPIO is used to control the thermostat relay (if set to AUTO, it works as a normal thermostat, when set to MAN, you can switch it manually).
-1 GPIO is used to control a relay freely manageable by the user.
-2 GPIO are used to interface to an I2C display (SSD1306).
+Il nodo "temperatura" serve per comandare apparecchiature per il riscaldamento.  
+1 GPIO viene usato per la sonda di temperatura e umidità (DHT22).  
+1 GPIO viene usato per comandare il relè termostato (se impostato in AUTO, funziona come un normale termostato, se impostato in MAN, lo si può commutare a piacere).  
+1 GPIO viene usato per comandare un relè liberamente gestibile dall'utente.  
+2 GPIO vengono usati per interfacciare un display I2C (SSD1306).  
 
-Commands to be sent to the topic "Temperatura_Topic":
+Comandi da inviare al topic "Temperatura_Topic":
 
-    man -> Set the thermostat in the "manual"  
-    Auto -> Set the thermostat in the "auto"  
-    t=XX o T=XX -> Set the thermostat to the temperature XX  
-    1on -> ON 1 command  
-    1off -> command OFF 1  
-    2on -> ON 2 command  
-    2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    read -> reads temperature  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    man           -> Imposta il termostato in "manuale"
+    auto          -> Imposta il termostato in "automatico"
+    t=XX o T=XX   -> Imposta il termostato alla temperatura XX
+    1on           -> comando ON 1
+    1off          -> comando OFF 1
+    2on           -> comando ON 2
+    2off          -> comando OFF 2
+    stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
+    read          -> legge la temperatura
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP
 
 ## SmartHome interruttore V 1.0
 
-Commands to be sent to the topic "Interruttore_Topic":
+Comandi da inviare al topic "Interruttore_Topic":
 
-The "switch" node is used to control lights or sockets.
-2 GPIO are used for controlling 2 relay freely managed by the user.
+Il nodo "interruttore" serve per comandare luci o prese.  
+2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
 
-    1on -> ON 1 command  
-    1off -> command OFF 1  
-    2on -> ON 2 command  
-    2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    1on           -> comando ON 1
+    1off          -> comando OFF 1
+    2on           -> comando ON 2
+    2off          -> comando OFF 2
+    stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP
