@@ -31,15 +31,15 @@ GPIO 1 is used to control a relay freely manageable by the user.
 Commands to be sent to the topic "Temperatura_Topic":
 
     man -> Set the thermostat in the "manual"  
-    Auto -> Set the thermostat in the "auto"  
-    t=XX o T=XX -> Set the thermostat to the temperature XX  
-    1on -> ON 1 command  
-    1off -> command OFF 1  
-    2on -> ON 2 command  
-    2off -> OFF 2 command  
-    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
-    read -> reads temperature  
-    reset -> cleans the EEPROM memory and resets the ESP  
+    Auto -> Set the thermostat in the "auto"  
+    t=XX o T=XX -> Set the thermostat to the temperature XX  
+    1on -> ON 1 command  
+    1off -> command OFF 1  
+    2on -> ON 2 command  
+    2off -> OFF 2 command  
+    stato -> returns the ACK topic relay status and how long the shutter can remain in action (in sec.)  
+    read -> reads temperature  
+    reset -> cleans the EEPROM memory and resets the ESP  
 
 ## SmartHome interruttore V 1.0
 
