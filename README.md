@@ -14,12 +14,12 @@ Il nodo "tapparella" serve per comandare tapparelle o serrande.
 
 Comandi da inviare al topic "Tapparella_Topic":
 
-`su            -> comando SU`  
-`giu           -> comando GIU`  
-`stop          -> comando STOP`  
-`t=XX o T=XX   -> XX Indica per quanto tempo la tapparella può restare in azione (in sec.)`  
-`stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)`  
-`reset         -> pulisce la memoria EEPROM e resetta l'ESP`  
+    su            -> comando SU  
+    giu           -> comando GIU  
+    stop          -> comando STOP  
+    t=XX o T=XX   -> XX Indica per quanto tempo la tapparella può restare in azione (in sec.)  
+    stato         -> restituisce sul topic ACK lo stato dei relè e per quanto tempo la tapparella può restare in azione (in sec.)  
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP  
 
 ## SmartHome temperatura V 1.0
 
