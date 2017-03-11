@@ -72,7 +72,7 @@ Comandi da inviare al topic "Interruttore_Topic":
 ## SmartHome cancello V 1.0
 
 Il nodo "cancello" serve per comandare cancelli o portoni.  
-* 2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
+* 2 GPIO vengono usati per comandare 2 relè temporizzati liberamente gestibili dall'utente.  
 
 Comandi da inviare al topic "Interruttore_Topic":
 
