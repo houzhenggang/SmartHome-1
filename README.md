@@ -1,14 +1,3 @@
-##Protocollo MQTT (Message Queuing Telemetry Transport) 
-e' un protocollo di comunicazione machine-to-machine (M2M) progettato come un protocollo estremamente leggero che implementa un architettura publish/subscribe.
-
-Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principali:
-* Un agent con il ruolo di Publisher: che invia messaggi al broker indirizzati ad uno specifico Topic
-* Un agent con il ruolo di Subscriber: che riceve messaggi dal broker provenienti da uno specifico Topic
-* Un Broker di comunicazione: un elemento centrale che orchestra tutti i processi di comunicazione e gestisce il ciclo di vita dei topic e dei messaggi
-* Un Topic: un canale di comunicazione dedicato. 
-
-
-
 # SmartHome: Casa domotica per ESP8266 basato sul protocollo MQTT.
 
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
@@ -18,6 +7,15 @@ E' in fase di sviluppo un applicazione Android (ancora in versione beta) dalla q
 
 A breve sarà disponibile nel Google Play un [applicazione](https://play.google.com/store/apps/details?id=roncoa.SmartHome) Android dalla quale è possibile gestire tutti i vari nodi.  
 Se vuoi diventare un beta tester clicca [QUI](https://play.google.com/apps/testing/roncoa.SmartHome)  
+
+### Protocollo MQTT (Message Queuing Telemetry Transport) 
+e' un protocollo di comunicazione machine-to-machine (M2M) progettato come un protocollo estremamente leggero che implementa un architettura publish/subscribe.
+
+Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principali:
+* Un agent con il ruolo di Publisher: che invia messaggi al broker indirizzati ad uno specifico Topic
+* Un agent con il ruolo di Subscriber: che riceve messaggi dal broker provenienti da uno specifico Topic
+* Un Broker di comunicazione: un elemento centrale che orchestra tutti i processi di comunicazione e gestisce il ciclo di vita dei topic e dei messaggi
+* Un Topic: un canale di comunicazione dedicato. 
 
 ## SmartHome tapparella V 1.0
 
