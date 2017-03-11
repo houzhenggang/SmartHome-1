@@ -3,8 +3,8 @@
 Il progetto si divide in nodi: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
 Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet). Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco).  
 Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
-E' in fase di sviluppo un applicazione Android (ancora in versione beta) dalla quale si possono gestire tutti i vari nodi. 
 
+Piccolo video di esempio [QUI](https://www.youtube.com/watch?v=D-fIuXN_vOU)  
 A breve sarà disponibile nel Google Play un [applicazione](https://play.google.com/store/apps/details?id=roncoa.SmartHome) Android dalla quale è possibile gestire tutti i vari nodi.  
 Se vuoi diventare un beta tester clicca [QUI](https://play.google.com/apps/testing/roncoa.SmartHome)  
 
