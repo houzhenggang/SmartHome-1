@@ -1,13 +1,14 @@
 # SmartHome: Casa domotica per ESP8266 basato sul protocollo MQTT
 
-Il progetto si divide in nodi realizzati con il microcontrollore ESP8266: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
-Il nodo "tapparella" serve per comandare tapparelle o serrande.  
-Il nodo "temperatura" è un termostato, serve per comandare apparecchiature per il riscaldamento.  
-Il nodo "interruttore" serve per comandare luci o prese.  
-Il nodo "cancello" serve per comandare cancelli o portoni.  
-Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet).  
-Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco). Si possono avere piu' nodi dello stesso tipo, basta che abbiano tutti un topic diverso (ad esempio: "tapparella_sala", "tapparella_cucina", "tapparella_bagno", ecc.) .  
-Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
+Il progetto SmartHome ha lo scopo di realizzare dei moduli domotici a basso costo per rendere "intelligente" la casa.  
+Si divide in moduli realizzati con il microcontrollore ESP8266: modulo tapparella, modulo temperatura, modulo interruttore e modulo cancello.  
+Il modulo "tapparella" serve per comandare tapparelle o serrande.  
+Il modulo "temperatura" è un termostato, serve per comandare apparecchiature per il riscaldamento.  
+Il modulo "interruttore" serve per comandare luci o prese.  
+Il modulo "cancello" serve per comandare cancelli o portoni.  
+Ogni modulo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet).  
+Per interagire con i singoli moduli bisogna mandare ad esso specifici comandi (contraddistinto da un topic MQTT univoco). Si possono avere piu' moduli dello stesso tipo, basta che abbiano tutti un topic diverso (ad esempio: "tapparella_sala", "tapparella_cucina", "tapparella_bagno", ecc.) .  
+Inviando i comandi al modulo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il modulo risponderà sul topic "ack".  
 
 Piccolo video di esempio [QUI](https://www.youtube.com/watch?v=D-fIuXN_vOU)  
 A breve sarà disponibile nel Google Play un [applicazione](https://play.google.com/store/apps/details?id=roncoa.SmartHome) Android dalla quale è possibile gestire tutti i vari nodi.  
