@@ -1,6 +1,10 @@
 # SmartHome: Casa domotica per ESP8266 basato sul protocollo MQTT
 
-Il progetto si divide in nodi: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
+Il progetto si divide in nodi realizzati con il microcontrollore ESP8266: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
+Il nodo "tapparella" serve per comandare tapparelle o serrande.  
+Il nodo "temperatura" serve per comandare apparecchiature per il riscaldamento.  
+Il nodo "interruttore" serve per comandare luci o prese.  
+Il nodo "cancello" serve per comandare cancelli o portoni.  
 Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet).  
 Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco). Si possono avere piu' nodi dello stesso tipo, basta che abbiano tutti un topic diverso (ad esempio: "tapparella_sala", "tapparella_cucina", "tapparella_bagno", ecc.) .  
 Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
@@ -20,7 +24,6 @@ Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principal
 
 ## SmartHome tapparella V 1.0
 
-Il nodo "tapparella" serve per comandare tapparelle o serrande.  
 * 2 GPIO vengono usati per comandare 2 relè (1 di abilitazione e 1 di inversione del movimento) per il movimento della tapparella.  
 * 2 GPIO vengono usati come ingressi fisici da pulsanti per comandare direttamente il movimento della tapparella.  
 
@@ -35,7 +38,6 @@ Comandi da inviare al topic "Tapparella_Topic":
 
 ## SmartHome temperatura V 1.0
 
-Il nodo "temperatura" serve per comandare apparecchiature per il riscaldamento.  
 * 1 GPIO viene usato per la sonda di temperatura e umidità (DHT22).  
 * 1 GPIO viene usato per comandare il relè termostato (se impostato in AUTO, funziona come un normale termostato, se impostato in MAN, lo si può commutare a piacere).  
 * 1 GPIO viene usato per comandare un relè liberamente gestibile dall'utente.  
@@ -56,7 +58,6 @@ Comandi da inviare al topic "Temperatura_Topic":
 
 ## SmartHome interruttore V 1.0
 
-Il nodo "interruttore" serve per comandare luci o prese.  
 * 2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
 
 Comandi da inviare al topic "Interruttore_Topic":
@@ -70,7 +71,6 @@ Comandi da inviare al topic "Interruttore_Topic":
 
 ## SmartHome cancello V 1.0
 
-Il nodo "cancello" serve per comandare cancelli o portoni.  
 * 2 GPIO vengono usati per comandare 2 relè temporizzati liberamente gestibili dall'utente.  
 
 Comandi da inviare al topic "Interruttore_Topic":
