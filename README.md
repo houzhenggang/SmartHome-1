@@ -1,6 +1,17 @@
+##Protocollo MQTT (Message Queuing Telemetry Transport) 
+e' un protocollo di comunicazione machine-to-machine (M2M) progettato come un protocollo estremamente legegro che implementa un architettura publish/subscribe.
+
+Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principali:
+* Un agent con il ruolo di Publisher: che invia messaggi al broker indirizzati ad uno specifico Topic
+* Un agent con il ruolo di Subscriber: che riceve messaggi dal broker provenienti da uno specifico Topic
+* Un Broker di comunicazione: un elemento centrale che orchestra tutti i processi di comunicazione e gestisce il ciclo di vita dei topic e dei messaggi
+* Un Topic: un canale di comunicazione dedicato. 
+
+
+
 # SmartHome: Casa domotica per ESP8266 basato sul protocollo MQTT.
 
-Il progetto si divide in nodi: nodi tapparella, nodi temperatura e nodi interruttore.  
+Il progetto si divide in nodi: nodi tapparella, nodi temperatura, nodi interruttoree nodi cancello.  
 Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet). Per interagire con i singoli nodi bisogna mandare specifici comandi al nodo (contraddistinto da un topic MQTT univoco).  
 Inviando i comandi al nodo (topic), si interagisce con esso, facendogli fare delle operazioni o interrogandolo. Il nodo risponderà sul topic "ack".  
 Nella cartella "Android" è presente un'app (ancora in versione beta) dalla quale di possono gestire i vari nodi.  
@@ -53,5 +64,17 @@ Comandi da inviare al topic "Interruttore_Topic":
     1off          -> Imposta il relè 1 a OFF  
     2on           -> Imposta il relè 2 a ON  
     2off          -> Imposta il relè 2 a OFF  
+    stato         -> restituisce sul topic ACK lo stato dei relè  
+    reset         -> pulisce la memoria EEPROM e resetta l'ESP  
+
+## SmartHome cancello V 1.0
+
+Il nodo "cancello" serve per comandare cancelli o portoni.  
+* 2 GPIO vengono usati per comandare 2 relè liberamente gestibili dall'utente.  
+
+Comandi da inviare al topic "Interruttore_Topic":
+
+    1on           -> Da un impulso ON al relè 1 per un determinato tempo gestibile dall'utente
+    2on           -> Da un impulso ON al relè 2 per un determinato tempo gestibile dall'utente
     stato         -> restituisce sul topic ACK lo stato dei relè  
     reset         -> pulisce la memoria EEPROM e resetta l'ESP  
