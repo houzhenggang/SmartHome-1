@@ -1,5 +1,5 @@
 ##Protocollo MQTT (Message Queuing Telemetry Transport) 
-e' un protocollo di comunicazione machine-to-machine (M2M) progettato come un protocollo estremamente legegro che implementa un architettura publish/subscribe.
+e' un protocollo di comunicazione machine-to-machine (M2M) progettato come un protocollo estremamente leggero che implementa un architettura publish/subscribe.
 
 Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principali:
 * Un agent con il ruolo di Publisher: che invia messaggi al broker indirizzati ad uno specifico Topic
