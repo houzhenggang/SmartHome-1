@@ -2,7 +2,7 @@
 
 Il progetto si divide in nodi realizzati con il microcontrollore ESP8266: nodi tapparella, nodi temperatura, nodi interruttore e nodi cancello.  
 Il nodo "tapparella" serve per comandare tapparelle o serrande.  
-Il nodo "temperatura" serve per comandare apparecchiature per il riscaldamento.  
+Il nodo "temperatura" è un termostato, serve per comandare apparecchiature per il riscaldamento.  
 Il nodo "interruttore" serve per comandare luci o prese.  
 Il nodo "cancello" serve per comandare cancelli o portoni.  
 Ogni nodo comunica attraverso il protocollo MQTT con il broker, che puo' essere locale (LAN) o remoto (internet).  
