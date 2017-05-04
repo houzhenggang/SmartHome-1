@@ -1,7 +1,7 @@
 /*
-  SmartHome tapparella V 1.0
+  SmartHome tapparella V 2.0
 
-  Comandi da inviare al topic "Tapparella_Topic": 
+  Comandi da inviare al topic "Tapparella_Topic":
   su            -> comando SU
   giu           -> comando GIU
   stop          -> comando STOP
@@ -15,64 +15,81 @@
 #include <TPush.h>
 #include <EEPROM.h>
 
+
+// Arduino OTA
+//#include <ESP8266WiFi.h>
+//#include <ESP8266mDNS.h>
+//#include <WiFiUdp.h>
+#include <ArduinoOTA.h>
+
+
 // MQTT server
-const char* ssid          = "WIFI SSID";          // WIFI SSID
-const char* password      = "WIFI password";      // WIFI password
-const char* mqtt_server   = "MQTT server";        // MQTT server
-const char* mqtt_user     = "MQTT user";          // MQTT user
-const char* mqtt_password = "MQTT password";      // MQTT password
-const int   mqtt_port     =  MQTT_port;           // MQTT port
+const char* ssid = "SSID" ;                 // WIFI SSID
+const char* password = "password";          // WIFI password
+const char* mqtt_server = "mqttserver";    	// MQTT server   
+const char* mqtt_user = "mqttuser";         // MQTT user
+const char* mqtt_password = "mqttpassword"; // MQTT password
+const int   mqtt_port = mqttport;           // MQTT port      
+
 
 // DEBUG
-#define DEBUG                                     // Commentare questa riga per disabilitare il SERIAL DEBUG
+//#define DEBUG                                      // Commentare questa riga per disabilitare il SERIAL DEBUG
 
 // HARDWARE
 //#define ESP01                                     // Commentare l'hardware non corrente
-#define NODEMCU                                   // Commentare l'hardware non corrente
-//#define ELECTRODRAGON                             // Commentare l'hardware non corrente
+//#define NODEMCU                                   // Commentare l'hardware non corrente
+#define ELECTRODRAGON                               // Commentare l'hardware non corrente
 
 // Tipo nodo
-#define TIPO_NODO         "TAP"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore
+#define TIPO_NODO         "TAP"                   // "TAP"->tapparella "TEM"->temperatura "INT"->interruttore "CAN"->cancello
 
 // MQTT topic
-#define Tapparella_Topic  "tapparella_1"            // Tapparella_Topic
+#define Tapparella_Topic  "tapparella/2P/camera/X"            // Tapparella_Topic (non usare underscore "_")
 #define ACK_Topic         "ack"                   // ACK_Topic
 
 // TEMPI
 #define MAX_RET_WIFI                20            // Indica per quante volte ritenta di connettersi al WIFI
 #define MAX_RET_MQTT                3             // Indica per quante volte ritenta di connettersi al server MQTT
 #define TEMPO_REFRESH_CONNESSIONE   60000         // Indica il timeout di refresh della connessione (60000=1 min.)
-#define TEMPO_CLICK_ON              150           // Indica il tempo minimo di pressione bottone
-#define TEMPO_CLICK_OFF             100           // Indica il tempo minimo di rilascio bottone
-#define TEMPO_RELE                  200           // Indica il tempo tra una commutazione RELE e la successiva
+#define TEMPO_CLICK_ON              250           // Indica il tempo minimo di pressione bottone (150)
+#define TEMPO_CLICK_OFF             250           // Indica il tempo minimo di rilascio bottone (100)
+#define TEMPO_RELE                  100           // Indica il tempo tra una commutazione RELE e la successiva (200)
 
 // GPIO
-#if defined(ESP01)                  // OK
+#if defined(ESP01)
 #define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
 #define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
 #define Status_LED                  4             // BUILTIN_LED : nodemcu->GPIO16 - ESP01->GPIO1(TX) 
-#define RELE_tapparella_ON          0             // RELE abilitazione
-#define RELE_tapparella_SU_GIU      2             // RELE SU/GIU
+#define RELE_tapparella_SU          0             // RELE abilitazione
+#define RELE_tapparella_GIU         2             // RELE SU/GIU
 #define BOTTONE_tapparella_SU       1             // Pulsante tapparella SU
 #define BOTTONE_tapparella_GIU      3             // Pulsante tapparella GIU
+#define PullUp                                    // resistenza PullUp verso vcc
+//#define PullDown                                // resistenza PullDown verso gnd
 #endif
+
 #if defined(NODEMCU)
 #define Flag_inversione_RELE        1             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)  
 #define Flag_inversione_Status_LED  0             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
 #define Status_LED                  16            // BUILTIN_LED : nodemcu->GPIO16 - ESP01->GPIO1(TX) 
-#define RELE_tapparella_ON          12            // RELE abilitazione
-#define RELE_tapparella_SU_GIU      13            // RELE SU/GIU
-#define BOTTONE_tapparella_SU       0             // Pulsante tapparella SU
-#define BOTTONE_tapparella_GIU      2             // Pulsante tapparella GIU
+#define RELE_tapparella_SU          12            // RELE abilitazione
+#define RELE_tapparella_GIU         13            // RELE SU/GIU
+#define BOTTONE_tapparella_SU       4             // Pulsante tapparella SU
+#define BOTTONE_tapparella_GIU      5             // Pulsante tapparella GIU
+#define PullUp                                    // resistenza PullUp verso vcc
+//#define PullDown                                // resistenza PullDown verso gnd
 #endif
-#if defined(ELECTRODRAGON)          // OK
+
+#if defined(ELECTRODRAGON)
 #define Flag_inversione_RELE        0             // Inversione del segnale di uscita RELE       (0=normale - 1=invertito)
 #define Flag_inversione_Status_LED  1             // Inversione del segnale di uscita Status_LED (0=normale - 1=invertito)
 #define Status_LED                  16            // BUILTIN_LED : nodemcu->GPIO16 - ESP01->GPIO1(TX)
-#define RELE_tapparella_ON          12            // RELE abilitazione
-#define RELE_tapparella_SU_GIU      13            // RELE SU/GIU
-#define BOTTONE_tapparella_SU       0             // Pulsante tapparella SU
-#define BOTTONE_tapparella_GIU      2             // Pulsante tapparella GIU
+#define RELE_tapparella_SU          12            // RELE abilitazione
+#define RELE_tapparella_GIU         13            // RELE SU/GIU
+#define BOTTONE_tapparella_SU       4             // Pulsante tapparella SU
+#define BOTTONE_tapparella_GIU      5             // Pulsante tapparella GIU
+#define PullUp                                    // resistenza PullUp verso vcc
+//#define PullDown                                // resistenza PullDown verso gnd
 #endif
 
 // VARIABILI
@@ -92,32 +109,40 @@ void setup() {
 #endif
   Serial.println();
   Serial.println(" ***** SmartHome tapparella *****");
-  Serial.println("Status_LED             = GPIO" + String(Status_LED));
-  Serial.println("RELE tapparella ON     = GPIO" + String(RELE_tapparella_ON));
-  Serial.println("RELE tapparella SU/GIU = GPIO" + String(RELE_tapparella_SU_GIU));
+  Serial.println("Nodo: " + String(Tapparella_Topic));
+  Serial.println("Status LED             = GPIO" + String(Status_LED));
+  Serial.println("RELE    tapparella SU  = GPIO" + String(RELE_tapparella_SU));
+  Serial.println("RELE    tapparella GIU = GPIO" + String(RELE_tapparella_GIU));
   Serial.println("BOTTONE tapparella SU  = GPIO" + String(BOTTONE_tapparella_SU));
   Serial.println("BOTTONE tapparella GIU = GPIO" + String(BOTTONE_tapparella_GIU));
 
   // Inizializza EEPROM
   EEPROM.begin(512);
   delay(10);
-  
+
   // Inizializza Status_LED
   pinMode(Status_LED, OUTPUT);
   digitalWrite(Status_LED, 0 ^ Flag_inversione_Status_LED);
 
   // Inizializza GPIO
-  pinMode(RELE_tapparella_ON, OUTPUT);
-  digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);
-  pinMode(RELE_tapparella_SU_GIU, OUTPUT);
-  digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);
+  pinMode(RELE_tapparella_SU, OUTPUT);
+  digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);
+  pinMode(RELE_tapparella_GIU, OUTPUT);
+  digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);
+#if defined(PullDown)
+  BottoneSU.setUp(BOTTONE_tapparella_SU, HIGH);
+  BottoneGIU.setUp(BOTTONE_tapparella_GIU, HIGH);
+#endif
+#if defined(PullUp)
   BottoneSU.setUp(BOTTONE_tapparella_SU, LOW);
   BottoneGIU.setUp(BOTTONE_tapparella_GIU, LOW);
+#endif
 
   // Inizializza connessioni
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
   setup_wifi();
+  beginOTA(Tapparella_Topic);
   reconnect();
 
   // Leggi TEMPO_MAX dalla EEPROM
@@ -166,7 +191,7 @@ void reconnect() {
     Serial.println(clientName);
     Serial.print("Attempting MQTT connection... ");
     if (client.connect(string2char(clientName), mqtt_user, mqtt_password)) {
-      Serial.println("connected!");
+      Serial.println("MQTT connected!");
       String payload = macToStr(mac);
       payload += " start at ";
       payload += getTime();
@@ -177,10 +202,37 @@ void reconnect() {
       client.subscribe(Tapparella_Topic);                     // Sottoscrivi Tapparella_Topic
     }
     else {
-      Serial.print("failed, rc = ");
+      Serial.print("MQTT failed, rc = ");
       Serial.println(client.state());
     }
   }
+}
+
+// starts OTA server
+void beginOTA(const char* hostname) {
+  ArduinoOTA.setHostname(hostname);
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start OTA ");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd OTA");
+    delay(1000);
+    Serial.println("Restart ESP");
+    ESP.restart();
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+  Serial.println("OTA is up");
 }
 
 void Send_ACK() {
@@ -204,28 +256,24 @@ void callback(char* topic, byte* message, unsigned int length) {
   String payload;
   if (String(topic) == Tapparella_Topic) {                                              // se arriva il comando sul topic "Tapparella_Topic"
     if ((char)message[0] == 's' & (char)message[1] == 'u' ) {                           // Topic "tapparella" = "su"
-      digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);                       // Spengo il RELE di abilitazione
+      digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);                      // RELE GIU = 0
       delay(TEMPO_RELE);                                                                // Aspetto
-      digitalWrite(RELE_tapparella_SU_GIU, 1 ^ Flag_inversione_RELE);                   // RELE SU/GIU = SU
-      delay(TEMPO_RELE);                                                                // Aspetto
-      digitalWrite(RELE_tapparella_ON, 1 ^ Flag_inversione_RELE);                       // Accendo il RELE di abilitazione
+      digitalWrite(RELE_tapparella_SU, 1 ^ Flag_inversione_RELE);                       // RELE SU = 1
       In_movimento = true;
       ulTime = millis();
     }
     if ((char)message[0] == 'g' & (char)message[1] == 'i' & (char)message[2] == 'u') {  // Topic "tapparella" = "giu"
-      digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);                       // Spengo il RELE di abilitazione
+      digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);                       // RELE SU = 0
       delay(TEMPO_RELE);                                                                // Aspetto
-      digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);                   // RELE SU/GIU = GIU
-      delay(TEMPO_RELE);                                                                // Aspetto
-      digitalWrite(RELE_tapparella_ON, 1 ^ Flag_inversione_RELE);                       // Accendo il RELE di abilitazione
+      digitalWrite(RELE_tapparella_GIU, 1 ^ Flag_inversione_RELE);                      // RELE GIU = 1
       In_movimento = true;
       ulTime = millis();
     }
     if ((char)message[0] == 's' & (char)message[1] == 't' & (char)message[2] == 'o' &
         (char)message[3] == 'p' ) {                                                     // Topic "tapparella" = "stop"
-      digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);                       // Spengo il RELE di abilitazione
+      digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);                       // RELE SU = 0
       delay(TEMPO_RELE);                                                                // Aspetto
-      digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);                   // Spengo il RELE SU/GIU
+      digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);                      // RELE GIU = 0
       In_movimento = false;
     }
     if (((char)message[0] == 'T' or (char)message[0] == 't') &
@@ -251,12 +299,12 @@ void callback(char* topic, byte* message, unsigned int length) {
       payload = macToStr(mac);
       payload += " T=";
       payload += TEMPO_MAX / 1000;
-      payload += "sec. SU/GIU=";
-      if (digitalRead(RELE_tapparella_SU_GIU) == true ^ Flag_inversione_RELE) payload += "SU";
-      if (digitalRead(RELE_tapparella_SU_GIU) == false ^ Flag_inversione_RELE) payload += "GIU";
-      payload += " ON=";
-      if (digitalRead(RELE_tapparella_ON) == true ^ Flag_inversione_RELE) payload += "ON";
-      if (digitalRead(RELE_tapparella_ON) == false ^ Flag_inversione_RELE) payload += "OFF";
+      payload += "sec. SU=";
+      if (digitalRead(RELE_tapparella_SU) == true ^ Flag_inversione_RELE) payload += "ON";
+      if (digitalRead(RELE_tapparella_SU) == false ^ Flag_inversione_RELE) payload += "OFF";
+      payload += " GIU=";
+      if (digitalRead(RELE_tapparella_GIU) == true ^ Flag_inversione_RELE) payload += "ON";
+      if (digitalRead(RELE_tapparella_GIU) == false ^ Flag_inversione_RELE) payload += "OFF";
       client.publish(ACK_Topic, (char*) payload.c_str());
       delay(100);
     }
@@ -275,6 +323,7 @@ void callback(char* topic, byte* message, unsigned int length) {
 }
 
 void loop() {
+  ArduinoOTA.handle();
   if (TIMER.Wait(TEMPO_REFRESH_CONNESSIONE)) {
     Serial.println("Timer -> check connections");
     if (WiFi.status() != WL_CONNECTED) {
@@ -286,43 +335,39 @@ void loop() {
   }
   if (((millis() - ulTime) > TEMPO_MAX) & In_movimento) {               // Tempo -> spengo!
     Serial.println("Tempo -> spengo!");
-    digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);         // Spengo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);         // RELE SU = 0
     delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);     // Spengo il RELE SU/GIU
+    digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);        // RELE SU = 0
     In_movimento = false;
   }
   if (BottoneSU.Click(TEMPO_CLICK_ON)) {                                // Bottone SU premuto!
     Serial.println("Bottone SU premuto!");
-    digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);         // Spengo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);        // RELE GIU = 0
     delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_SU_GIU, 1 ^ Flag_inversione_RELE);     // RELE SU/GIU = SU
-    delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_ON, 1 ^ Flag_inversione_RELE);         // Accendo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_SU, 1 ^ Flag_inversione_RELE);         // RELE SU = 1
     In_movimento = true;
     ulTime = millis();
   }
   if (BottoneGIU.Click(TEMPO_CLICK_ON)) {                                // Bottone GIU premuto!
     Serial.println("Bottone GIU premuto!");
-    digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);         // Spengo il RELE di abilitazione
-    delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);     // RELE SU/GIU = GIU
-    delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_ON, 1 ^ Flag_inversione_RELE);         // Accendo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);          // RELE SU = 0
+    delay(TEMPO_RELE);                                                   // Aspetto
+    digitalWrite(RELE_tapparella_GIU, 1 ^ Flag_inversione_RELE);         // RELE GIU = 1
     In_movimento = true;
     ulTime = millis();
   }
   if (t = BottoneSU.Keep(TEMPO_CLICK_OFF)) {                            // Bottone SU rilasciato!
     Serial.println("BottoneSU OFF -> spengo!");
-    digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);         // Spengo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);         // RELE SU = 0
     delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);     // Spengo il RELE SU/GIU
+    digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);        // RELE GIU = 0
     In_movimento = false;
   }
   if (t = BottoneGIU.Keep(TEMPO_CLICK_OFF)) {                           // Bottone GIU rilasciato!
     Serial.println("BottoneGIU OFF -> spengo!");
-    digitalWrite(RELE_tapparella_ON, 0 ^ Flag_inversione_RELE);         // Spengo il RELE di abilitazione
+    digitalWrite(RELE_tapparella_SU, 0 ^ Flag_inversione_RELE);         // RELE SU = 0
     delay(TEMPO_RELE);                                                  // Aspetto
-    digitalWrite(RELE_tapparella_SU_GIU, 0 ^ Flag_inversione_RELE);     // Spengo il RELE SU/GIU
+    digitalWrite(RELE_tapparella_GIU, 0 ^ Flag_inversione_RELE);        // RELE GIU = 0
     In_movimento = false;
   }
   client.loop();
