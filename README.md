@@ -23,9 +23,9 @@ Nella sua essenza un architettura Publish/Subscribe prevede 4 elementi principal
 * Un Broker di comunicazione: un elemento centrale che orchestra tutti i processi di comunicazione e gestisce il ciclo di vita dei topic e dei messaggi
 * Un Topic: un canale di comunicazione dedicato. 
 
-## SmartHome tapparella V 1.0
+## SmartHome tapparella V 2.0
 
-* 2 GPIO vengono usati per comandare 2 relè (1 di abilitazione e 1 di inversione del movimento) per il movimento della tapparella.  
+* 2 GPIO vengono usati per comandare 2 relè per il movimento della tapparella.  
 * 2 GPIO vengono usati come ingressi fisici da pulsanti per comandare direttamente il movimento della tapparella.  
 
 Comandi da inviare al topic "Tapparella_Topic":
